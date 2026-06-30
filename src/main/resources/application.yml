@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: sinapta-ecossistema
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+server:
+  port: ${PORT:8080}
+
+app:
+  crypto:
+    secret-key: ${SINAPTA_CRYPTO_KEY:troque-esta-chave-em-producao-32b}
+  jwt:
+    secret: ${SINAPTA_JWT_SECRET:troque-este-segredo-jwt-em-producao}
+    expiration-minutes: 480
+  storage:
+    base-dir: ${SINAPTA_STORAGE_DIR:./storage}
+  reminders:
+    check-cron: "0 0 * * * *"
+  admin:
+    email: ${SINAPTA_ADMIN_EMAIL:}
+    password: ${SINAPTA_ADMIN_PASSWORD:}
+  site-seed:
+    admin-login: ${SINAPTA_SITE_ADMIN_LOGIN:00.000.000/0001-00}
+    admin-password: ${SINAPTA_SITE_ADMIN_PASSWORD:trocar-no-painel-do-site}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:file:./data/sinapta;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${SINAPTA_DB_URL:jdbc:postgresql://localhost:5432/sinapta}
+    username: ${SINAPTA_DB_USER:sinapta}
+    password: ${SINAPTA_DB_PASSWORD:}
+  jpa:
+    hibernate:
+      # update por simplicidade nesta fase do projeto; trocar por Flyway/Liquibase
+      # antes de operar com dados reais de producao em escala.
+      ddl-auto: update

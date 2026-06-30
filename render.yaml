@@ -1,0 +1,51 @@
+databases:
+  - name: sinapta-db
+    plan: free
+    databaseName: sinapta
+    user: sinapta
+
+services:
+  - type: web
+    name: sinapta-ecossistema
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: sinapta-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sinapta-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: sinapta-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: sinapta-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sinapta-db
+          property: password
+      - key: SINAPTA_CRYPTO_KEY
+        generateValue: true
+      - key: SINAPTA_JWT_SECRET
+        generateValue: true
+      - key: SINAPTA_ADMIN_EMAIL
+        sync: false
+      - key: SINAPTA_ADMIN_PASSWORD
+        sync: false
+      - key: SINAPTA_STORAGE_DIR
+        value: /data/storage
+    disk:
+      name: sinapta-storage
+      mountPath: /data/storage
+      sizeGB: 1
